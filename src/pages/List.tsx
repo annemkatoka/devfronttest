@@ -1,16 +1,10 @@
 import axios from "axios";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import Spinner from "../components/Layout/Spinner";
 import MovieCard from "../components/MovieCard";
 import SearchBar from "../components/SearchBar";
-
-interface Movie {
-  Title: string;
-  Poster: string;
-  Plot: string;
-  imdbRating: string;
-  imdbID: string;
-}
+import { Movie } from "../interfaces/Movie";
 
 export default function List() {
   const url = "https://www.omdbapi.com/";
@@ -19,18 +13,19 @@ export default function List() {
   const [titulo, setTitulo] = useState("");
   const [anho, setAnho] = useState("");
   const [movieData, setMovieData] = useState<Movie | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
-    console.log("titulo: ", titulo);
-    console.log("anho: ", anho);
     e.preventDefault();
+    setLoading(true);
     axios
       .get(`${url}?t=${titulo}&y=${anho}&apikey=${apiKey}`)
       .then((response) => {
         const result = response.data;
         setMovieData(result);
-        console.log("result", result);
-      });
+        setLoading(false);
+      })
+      .catch((e) => setLoading(false));
   };
 
   const handleTitleChange = (value: string) => {
@@ -42,19 +37,25 @@ export default function List() {
   };
   return (
     <>
+      <h1 className="text-center mt-4 mr-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 dark:text-white">
+        Buscador de películas
+      </h1>
       <SearchBar
         handleSubmit={handleSubmit}
         handleAnhoChange={handleAnhoChange}
         handleTitleChange={handleTitleChange}
       />
-      <Link to={`/movie/${movieData?.imdbID}`}>
-        <MovieCard
-          imageSrc={movieData?.Poster || ""}
-          title={movieData?.Title || ""}
-          description={movieData?.Plot || ""}
-          rate={movieData?.imdbRating || ""}
-        />
-      </Link>
+      {movieData && (
+        <Link to={`/movie/${movieData?.imdbID}`}>
+          <MovieCard
+            imageSrc={movieData?.Poster || ""}
+            title={movieData?.Title || ""}
+            description={movieData?.Plot || ""}
+            rate={movieData?.imdbRating || ""}
+          />
+        </Link>
+      )}
+      {loading && <Spinner />}
     </>
   );
 }
