@@ -38,7 +38,7 @@ export default function List() {
   return (
     <>
       <h1 className="text-center mt-4 mr-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 dark:text-white">
-        Buscador de películas
+        Mentoría
       </h1>
       <SearchBar
         handleSubmit={handleSubmit}
